@@ -1,0 +1,192 @@
+{
+  "format_version": "1.0",
+  "terraform_version": "1.15.2",
+  "values": {
+    "outputs": {
+      "bucket_arn": {
+        "sensitive": false,
+        "value": "arn:aws:s3:::demo-bucket",
+        "type": "string"
+      },
+      "bucket_name": {
+        "sensitive": false,
+        "value": "demo-bucket",
+        "type": "string"
+      }
+    },
+    "root_module": {
+      "resources": [
+        {
+          "address": "aws_kms_key.s3",
+          "mode": "managed",
+          "type": "aws_kms_key",
+          "name": "s3",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "arn": "arn:aws:kms:us-east-1:000000000000:key/419b3ffc-272b-4771-abde-58bc062df276",
+            "bypass_policy_lockout_safety_check": false,
+            "custom_key_store_id": "",
+            "customer_master_key_spec": "SYMMETRIC_DEFAULT",
+            "deletion_window_in_days": 7,
+            "description": "CMK for demo-bucket encryption",
+            "enable_key_rotation": true,
+            "id": "419b3ffc-272b-4771-abde-58bc062df276",
+            "is_enabled": true,
+            "key_id": "419b3ffc-272b-4771-abde-58bc062df276",
+            "key_usage": "ENCRYPT_DECRYPT",
+            "multi_region": false,
+            "policy": "{\"Statement\":[{\"Action\":\"kms:*\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::000000000000:root\"},\"Resource\":\"*\",\"Sid\":\"Enable IAM User Permissions\"}],\"Version\":\"2012-10-17\"}",
+            "rotation_period_in_days": 0,
+            "tags": null,
+            "tags_all": {},
+            "timeouts": null,
+            "xks_key_id": ""
+          },
+          "sensitive_values": {
+            "tags_all": {}
+          }
+        },
+        {
+          "address": "aws_s3_bucket.demo",
+          "mode": "managed",
+          "type": "aws_s3_bucket",
+          "name": "demo",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "acceleration_status": "",
+            "acl": null,
+            "arn": "arn:aws:s3:::demo-bucket",
+            "bucket": "demo-bucket",
+            "bucket_domain_name": "demo-bucket.s3.amazonaws.com",
+            "bucket_prefix": "",
+            "bucket_regional_domain_name": "demo-bucket.s3.us-east-1.amazonaws.com",
+            "cors_rule": [],
+            "force_destroy": false,
+            "grant": [
+              {
+                "id": "000000000000",
+                "permissions": [
+                  "FULL_CONTROL"
+                ],
+                "type": "CanonicalUser",
+                "uri": ""
+              }
+            ],
+            "hosted_zone_id": "Z3AQBSTGFYJSTF",
+            "id": "demo-bucket",
+            "lifecycle_rule": [],
+            "logging": [],
+            "object_lock_configuration": [],
+            "object_lock_enabled": false,
+            "policy": "",
+            "region": "us-east-1",
+            "replication_configuration": [
+              {
+                "role": null,
+                "rules": []
+              }
+            ],
+            "request_payer": "BucketOwner",
+            "server_side_encryption_configuration": [],
+            "tags": {},
+            "tags_all": {},
+            "timeouts": null,
+            "versioning": [
+              {
+                "enabled": false,
+                "mfa_delete": false
+              }
+            ],
+            "website": [],
+            "website_domain": null,
+            "website_endpoint": null
+          },
+          "sensitive_values": {
+            "cors_rule": [],
+            "grant": [
+              {
+                "permissions": [
+                  false
+                ]
+              }
+            ],
+            "lifecycle_rule": [],
+            "logging": [],
+            "object_lock_configuration": [],
+            "replication_configuration": [
+              {
+                "rules": []
+              }
+            ],
+            "server_side_encryption_configuration": [],
+            "tags": {},
+            "tags_all": {},
+            "versioning": [
+              {}
+            ],
+            "website": []
+          }
+        },
+        {
+          "address": "aws_s3_bucket_public_access_block.demo",
+          "mode": "managed",
+          "type": "aws_s3_bucket_public_access_block",
+          "name": "demo",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "block_public_acls": true,
+            "block_public_policy": true,
+            "bucket": "demo-bucket",
+            "id": "demo-bucket",
+            "ignore_public_acls": true,
+            "restrict_public_buckets": true
+          },
+          "sensitive_values": {},
+          "depends_on": [
+            "aws_s3_bucket.demo"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_server_side_encryption_configuration.demo",
+          "mode": "managed",
+          "type": "aws_s3_bucket_server_side_encryption_configuration",
+          "name": "demo",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "bucket": "demo-bucket",
+            "expected_bucket_owner": "",
+            "id": "demo-bucket",
+            "rule": [
+              {
+                "apply_server_side_encryption_by_default": [
+                  {
+                    "kms_master_key_id": "arn:aws:kms:us-east-1:000000000000:key/419b3ffc-272b-4771-abde-58bc062df276",
+                    "sse_algorithm": "aws:kms"
+                  }
+                ],
+                "bucket_key_enabled": null
+              }
+            ]
+          },
+          "sensitive_values": {
+            "rule": [
+              {
+                "apply_server_side_encryption_by_default": [
+                  {}
+                ]
+              }
+            ]
+          },
+          "depends_on": [
+            "aws_kms_key.s3",
+            "aws_s3_bucket.demo"
+          ]
+        }
+      ]
+    }
+  }
+}

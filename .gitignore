@@ -1,0 +1,7 @@
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.yml
+*.zip
+*.hcl
+*.terraform/
