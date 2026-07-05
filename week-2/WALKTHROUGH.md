@@ -448,13 +448,16 @@ trail's S3 bucket at the actual CloudTrail key convention. This is clearly
 — but the log *files* themselves are correctly shaped, so you get something
 real to practice parsing against.
 
-**Just run it:**
+**Just run it — after `terraform apply` has run at least once:**
 ```bash
 bash scripts/04-synthetic-cloudtrail-log.sh
 ```
-That's the whole thing — no setup needed beyond the bucket existing (the
-script creates `week2-cloudtrail-logs` itself if it's missing). Each run
-performs:
+`week2-cloudtrail-logs` is Terraform-managed (`aws_s3_bucket.cloudtrail_logs`
+in `hardening.tf`, with the same PAB + SSE-KMS hardening as `access_logs`,
+plus the real bucket policy a CloudTrail trail requires). The script checks
+for the bucket with `head-bucket` and exits with an error telling you to run
+`terraform apply` first if it doesn't exist yet — it no longer creates the
+bucket itself. Each run then performs:
 - 5 successful `s3:GetObject` calls (one real object per PII bucket)
 - 1 deliberately failed `s3:GetObject` (a key that was never uploaded)
 - 1 successful `rds:DescribeDBInstances`

@@ -118,6 +118,62 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "access_logs" {
   }
 }
 
+# --- Synthetic CloudTrail log destination bucket ---
+# Used by scripts/04-synthetic-cloudtrail-log.sh (see WALKTHROUGH.md section
+# 4d) — CloudTrail can't actually capture events on Floci (confirmed by its
+# own docs: "Floci does not record live API activity into trails"), so this
+# script writes real, correctly-formatted CloudTrail log files here by hand.
+# Now Terraform-managed instead of created ad hoc by the script, same
+# baseline hardening as access_logs, plus the actual bucket policy a real
+# CloudTrail trail requires (harmless here since nothing ever writes via the
+# service principal, but it's the textbook-correct config).
+resource "aws_s3_bucket" "cloudtrail_logs" {
+  bucket = "week2-cloudtrail-logs"
+}
+
+resource "aws_s3_bucket_public_access_block" "cloudtrail_logs" {
+  bucket                  = aws_s3_bucket.cloudtrail_logs.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "cloudtrail_logs" {
+  bucket = aws_s3_bucket.cloudtrail_logs.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = aws_kms_key.pii.arn
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "cloudtrail_logs" {
+  bucket     = aws_s3_bucket.cloudtrail_logs.id
+  depends_on = [aws_s3_bucket_public_access_block.cloudtrail_logs]
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "AWSCloudTrailAclCheck"
+        Effect    = "Allow"
+        Principal = { Service = "cloudtrail.amazonaws.com" }
+        Action    = "s3:GetBucketAcl"
+        Resource  = aws_s3_bucket.cloudtrail_logs.arn
+      },
+      {
+        Sid       = "AWSCloudTrailWrite"
+        Effect    = "Allow"
+        Principal = { Service = "cloudtrail.amazonaws.com" }
+        Action    = "s3:PutObject"
+        Resource  = "${aws_s3_bucket.cloudtrail_logs.arn}/AWSLogs/*"
+        Condition = { StringEquals = { "s3:x-amz-acl" = "bucket-owner-full-control" } }
+      }
+    ]
+  })
+}
+
 # Real audit trail: since neither S3 access logging nor CloudTrail data events
 # are actually deliverable in this environment (both confirmed by hand — see
 # WALKTHROUGH.md section 4), scripts/03-cloudwatch-access-log.sh publishes
