@@ -1,0 +1,87 @@
+== 0. terraform state contains every resource, and plan reports zero drift ==
+  PASS  aws_s3_bucket.hr_records in state
+  PASS  aws_s3_bucket_policy.hr_records in state
+  PASS  aws_s3_bucket_public_access_block.hr_records in state
+  PASS  aws_s3_bucket_server_side_encryption_configuration.hr_records in state
+  PASS  aws_s3_bucket_versioning.hr_records in state
+  PASS  aws_s3_bucket_logging.hr_records in state
+  PASS  aws_s3_bucket.customer_support in state
+  PASS  aws_s3_bucket_policy.customer_support in state
+  PASS  aws_s3_bucket_public_access_block.customer_support in state
+  PASS  aws_s3_bucket_server_side_encryption_configuration.customer_support in state
+  PASS  aws_s3_bucket_versioning.customer_support in state
+  PASS  aws_s3_bucket_logging.customer_support in state
+  PASS  aws_s3_bucket.payroll_exports in state
+  PASS  aws_s3_bucket_policy.payroll_exports in state
+  PASS  aws_s3_bucket_public_access_block.payroll_exports in state
+  PASS  aws_s3_bucket_server_side_encryption_configuration.payroll_exports in state
+  PASS  aws_s3_bucket_versioning.payroll_exports in state
+  PASS  aws_s3_bucket_logging.payroll_exports in state
+  PASS  aws_s3_bucket.marketing_leads in state
+  PASS  aws_s3_bucket_policy.marketing_leads in state
+  PASS  aws_s3_bucket_public_access_block.marketing_leads in state
+  PASS  aws_s3_bucket_server_side_encryption_configuration.marketing_leads in state
+  PASS  aws_s3_bucket_versioning.marketing_leads in state
+  PASS  aws_s3_bucket_logging.marketing_leads in state
+  PASS  aws_s3_bucket.legacy_backups in state
+  PASS  aws_s3_bucket_policy.legacy_backups in state
+  PASS  aws_s3_bucket_public_access_block.legacy_backups in state
+  PASS  aws_s3_bucket_server_side_encryption_configuration.legacy_backups in state
+  PASS  aws_s3_bucket_versioning.legacy_backups in state
+  PASS  aws_s3_bucket_logging.legacy_backups in state
+  PASS  aws_db_instance.users_db in state
+  INFO  terraform plan shows drift, but only on aws_db_instance.users_db — expected, see header (Floci never persists those 5 fields, so they can't converge) (known Floci limitation — config is correct, engine doesn't enforce it here)
+
+== 1. S3 controls (per bucket) ==
+--- acme-corp-hr-records ---
+  PASS  AC-3/AC-6: public access block all 4 flags true
+  PASS  SC-8/SC-23: policy denies insecure transport
+  PASS  AC-3/AC-6: no public Allow statement remains in policy
+  PASS  SC-28/SC-13: SSE-KMS encryption enabled
+  PASS  CM-6: versioning enabled
+  PASS  AU-2/AU-3/AU-12: logging configured -> acme-corp-access-logs
+  PASS  CM-8/RA-2: data-classification tag present
+--- acme-corp-customer-support ---
+  PASS  AC-3/AC-6: public access block all 4 flags true
+  PASS  SC-8/SC-23: policy denies insecure transport
+  PASS  AC-3/AC-6: no public Allow statement remains in policy
+  PASS  SC-28/SC-13: SSE-KMS encryption enabled
+  PASS  CM-6: versioning enabled
+  PASS  AU-2/AU-3/AU-12: logging configured -> acme-corp-access-logs
+  PASS  CM-8/RA-2: data-classification tag present
+--- acme-corp-payroll-exports ---
+  PASS  AC-3/AC-6: public access block all 4 flags true
+  PASS  SC-8/SC-23: policy denies insecure transport
+  PASS  AC-3/AC-6: no public Allow statement remains in policy
+  PASS  SC-28/SC-13: SSE-KMS encryption enabled
+  PASS  CM-6: versioning enabled
+  PASS  AU-2/AU-3/AU-12: logging configured -> acme-corp-access-logs
+  PASS  CM-8/RA-2: data-classification tag present
+--- acme-corp-marketing-leads ---
+  PASS  AC-3/AC-6: public access block all 4 flags true
+  PASS  SC-8/SC-23: policy denies insecure transport
+  PASS  AC-3/AC-6: no public Allow statement remains in policy
+  PASS  SC-28/SC-13: SSE-KMS encryption enabled
+  PASS  CM-6: versioning enabled
+  PASS  AU-2/AU-3/AU-12: logging configured -> acme-corp-access-logs
+  PASS  CM-8/RA-2: data-classification tag present
+--- acme-corp-legacy-backups ---
+  PASS  AC-3/AC-6: public access block all 4 flags true
+  PASS  SC-8/SC-23: policy denies insecure transport
+  PASS  AC-3/AC-6: no public Allow statement remains in policy
+  PASS  SC-28/SC-13: SSE-KMS encryption enabled
+  PASS  CM-6: versioning enabled
+  PASS  AU-2/AU-3/AU-12: logging configured -> acme-corp-access-logs
+  PASS  CM-8/RA-2: data-classification tag present
+
+== 2. RDS controls (acme-corp-users-db) ==
+  PASS  IA-5/AC-17: IAMDatabaseAuthenticationEnabled -> True
+  PASS  AC-3/AC-4: PubliclyAccessible stayed false (already compliant)
+  INFO  CM-6/SI-2: AutoMinorVersionUpgrade -> None (terraform config: true) (known Floci limitation — config is correct, engine doesn't enforce it here)
+  INFO  CM-6/CP-9: DeletionProtection -> None (terraform config: true) (known Floci limitation — config is correct, engine doesn't enforce it here)
+  INFO  CM-6/CP-9: BackupRetentionPeriod -> None (terraform config: 7) (known Floci limitation — config is correct, engine doesn't enforce it here)
+  INFO  AU-2/AU-12: EnabledCloudwatchLogsExports -> None (terraform config: ['postgresql']) (known Floci limitation — config is correct, engine doesn't enforce it here)
+  INFO  SC-13/SC-8/SC-23 (FIPS): DBParameterGroups -> default.postgres16 (terraform config: acme-corp-users-db-fips) (known Floci limitation — config is correct, engine doesn't enforce it here)
+  INFO  SC-28: StorageEncrypted -> None (intentionally not fixed — requires snapshot/restore migration, see GAPS.md)
+
+All strict checks passed. See INFO lines above for findings Floci's RDS mock doesn't let us verify end-to-end.

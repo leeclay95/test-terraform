@@ -1,0 +1,1602 @@
+{
+  "format_version": "1.0",
+  "terraform_version": "1.15.2",
+  "values": {
+    "root_module": {
+      "resources": [
+        {
+          "address": "aws_cloudwatch_log_group.pii_access_audit",
+          "mode": "managed",
+          "type": "aws_cloudwatch_log_group",
+          "name": "pii_access_audit",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "arn": "arn:aws:logs:us-east-1:000000000000:log-group:/acme-corp/pii-access-audit",
+            "id": "/acme-corp/pii-access-audit",
+            "kms_key_id": "",
+            "log_group_class": "",
+            "name": "/acme-corp/pii-access-audit",
+            "name_prefix": "",
+            "retention_in_days": 90,
+            "skip_destroy": false,
+            "tags": {},
+            "tags_all": {}
+          },
+          "sensitive_values": {
+            "tags": {},
+            "tags_all": {}
+          }
+        },
+        {
+          "address": "aws_db_instance.users_db",
+          "mode": "managed",
+          "type": "aws_db_instance",
+          "name": "users_db",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 2,
+          "values": {
+            "address": "172.18.0.2",
+            "allocated_storage": 20,
+            "allow_major_version_upgrade": null,
+            "apply_immediately": true,
+            "arn": "arn:aws:rds:us-east-1:000000000000:db:acme-corp-users-db",
+            "auto_minor_version_upgrade": false,
+            "availability_zone": "us-east-1c",
+            "backup_retention_period": 0,
+            "backup_target": "",
+            "backup_window": "04:00-06:00",
+            "blue_green_update": [],
+            "ca_cert_identifier": "",
+            "character_set_name": "",
+            "copy_tags_to_snapshot": false,
+            "custom_iam_instance_profile": "",
+            "customer_owned_ip_enabled": false,
+            "database_insights_mode": "",
+            "db_name": "appdb",
+            "db_subnet_group_name": "default",
+            "dedicated_log_volume": false,
+            "delete_automated_backups": true,
+            "deletion_protection": false,
+            "domain": "",
+            "domain_auth_secret_arn": "",
+            "domain_dns_ips": [],
+            "domain_fqdn": "",
+            "domain_iam_role_name": "",
+            "domain_ou": "",
+            "enabled_cloudwatch_logs_exports": [
+              "postgresql"
+            ],
+            "endpoint": "172.18.0.2:7001",
+            "engine": "postgres",
+            "engine_lifecycle_support": "",
+            "engine_version": "16.3",
+            "engine_version_actual": "16.3",
+            "final_snapshot_identifier": null,
+            "hosted_zone_id": "",
+            "iam_database_authentication_enabled": true,
+            "id": "db-1065610651D2480CA6BFEB79",
+            "identifier": "acme-corp-users-db",
+            "identifier_prefix": "",
+            "instance_class": "db.t3.micro",
+            "iops": 0,
+            "kms_key_id": "",
+            "latest_restorable_time": "",
+            "license_model": "",
+            "listener_endpoint": [],
+            "maintenance_window": "mon:00:00-mon:03:00",
+            "manage_master_user_password": null,
+            "master_user_secret": [],
+            "master_user_secret_kms_key_id": null,
+            "max_allocated_storage": 0,
+            "monitoring_interval": 0,
+            "monitoring_role_arn": "",
+            "multi_az": false,
+            "nchar_character_set_name": "",
+            "network_type": "",
+            "option_group_name": null,
+            "parameter_group_name": "default.postgres16",
+            "password": "DemoPass123!",
+            "password_wo": null,
+            "password_wo_version": null,
+            "performance_insights_enabled": false,
+            "performance_insights_kms_key_id": "",
+            "performance_insights_retention_period": 0,
+            "port": 7001,
+            "publicly_accessible": false,
+            "replica_mode": "",
+            "replicas": [],
+            "replicate_source_db": "",
+            "resource_id": "db-1065610651D2480CA6BFEB79",
+            "restore_to_point_in_time": [],
+            "s3_import": [],
+            "skip_final_snapshot": true,
+            "snapshot_identifier": null,
+            "status": "available",
+            "storage_encrypted": false,
+            "storage_throughput": 0,
+            "storage_type": "gp2",
+            "tags": {
+              "data-classification": "pii",
+              "demo": "week-2-import",
+              "owner": "acme-corp-app-team"
+            },
+            "tags_all": {
+              "data-classification": "pii",
+              "demo": "week-2-import",
+              "owner": "acme-corp-app-team"
+            },
+            "timeouts": null,
+            "timezone": "",
+            "upgrade_storage_config": null,
+            "username": "appadmin",
+            "vpc_security_group_ids": [
+              "sg-00000000"
+            ]
+          },
+          "sensitive_values": {
+            "blue_green_update": [],
+            "domain_dns_ips": [],
+            "enabled_cloudwatch_logs_exports": [
+              false
+            ],
+            "listener_endpoint": [],
+            "master_user_secret": [],
+            "password": true,
+            "password_wo": true,
+            "replicas": [],
+            "restore_to_point_in_time": [],
+            "s3_import": [],
+            "tags": {},
+            "tags_all": {},
+            "vpc_security_group_ids": [
+              false
+            ]
+          },
+          "depends_on": [
+            "aws_db_parameter_group.users_db_fips"
+          ]
+        },
+        {
+          "address": "aws_db_parameter_group.users_db_fips",
+          "mode": "managed",
+          "type": "aws_db_parameter_group",
+          "name": "users_db_fips",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "arn": "",
+            "description": "Managed by Terraform",
+            "family": "postgres16",
+            "id": "acme-corp-users-db-fips",
+            "name": "acme-corp-users-db-fips",
+            "name_prefix": "",
+            "parameter": [
+              {
+                "apply_method": "pending-reboot",
+                "name": "rds.force_ssl",
+                "value": "1"
+              }
+            ],
+            "skip_destroy": false,
+            "tags": {},
+            "tags_all": {}
+          },
+          "sensitive_values": {
+            "parameter": [
+              {}
+            ],
+            "tags": {},
+            "tags_all": {}
+          }
+        },
+        {
+          "address": "aws_kms_key.pii",
+          "mode": "managed",
+          "type": "aws_kms_key",
+          "name": "pii",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "arn": "arn:aws:kms:us-east-1:000000000000:key/1e12849d-22a5-46b3-8239-7c2f5baebdf7",
+            "bypass_policy_lockout_safety_check": false,
+            "custom_key_store_id": "",
+            "customer_master_key_spec": "SYMMETRIC_DEFAULT",
+            "deletion_window_in_days": 7,
+            "description": "CMK for PII bucket encryption",
+            "enable_key_rotation": true,
+            "id": "1e12849d-22a5-46b3-8239-7c2f5baebdf7",
+            "is_enabled": true,
+            "key_id": "1e12849d-22a5-46b3-8239-7c2f5baebdf7",
+            "key_usage": "ENCRYPT_DECRYPT",
+            "multi_region": false,
+            "policy": "{\"Statement\":[{\"Action\":\"kms:*\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::000000000000:root\"},\"Resource\":\"*\",\"Sid\":\"Enable IAM User Permissions\"}],\"Version\":\"2012-10-17\"}",
+            "rotation_period_in_days": 0,
+            "tags": {},
+            "tags_all": {},
+            "timeouts": null,
+            "xks_key_id": ""
+          },
+          "sensitive_values": {
+            "tags": {},
+            "tags_all": {}
+          }
+        },
+        {
+          "address": "aws_s3_bucket.access_logs",
+          "mode": "managed",
+          "type": "aws_s3_bucket",
+          "name": "access_logs",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "acceleration_status": "",
+            "acl": null,
+            "arn": "arn:aws:s3:::acme-corp-access-logs",
+            "bucket": "acme-corp-access-logs",
+            "bucket_domain_name": "acme-corp-access-logs.s3.amazonaws.com",
+            "bucket_prefix": "",
+            "bucket_regional_domain_name": "acme-corp-access-logs.s3.us-east-1.amazonaws.com",
+            "cors_rule": [],
+            "force_destroy": null,
+            "grant": [
+              {
+                "id": "000000000000",
+                "permissions": [
+                  "FULL_CONTROL"
+                ],
+                "type": "CanonicalUser",
+                "uri": ""
+              }
+            ],
+            "hosted_zone_id": "Z3AQBSTGFYJSTF",
+            "id": "acme-corp-access-logs",
+            "lifecycle_rule": [],
+            "logging": [],
+            "object_lock_configuration": [],
+            "object_lock_enabled": false,
+            "policy": "",
+            "region": "us-east-1",
+            "replication_configuration": [
+              {
+                "role": null,
+                "rules": []
+              }
+            ],
+            "request_payer": "BucketOwner",
+            "server_side_encryption_configuration": [],
+            "tags": {},
+            "tags_all": {},
+            "timeouts": null,
+            "versioning": [
+              {
+                "enabled": false,
+                "mfa_delete": false
+              }
+            ],
+            "website": [],
+            "website_domain": null,
+            "website_endpoint": null
+          },
+          "sensitive_values": {
+            "cors_rule": [],
+            "grant": [
+              {
+                "permissions": [
+                  false
+                ]
+              }
+            ],
+            "lifecycle_rule": [],
+            "logging": [],
+            "object_lock_configuration": [],
+            "replication_configuration": [
+              {
+                "rules": []
+              }
+            ],
+            "server_side_encryption_configuration": [],
+            "tags": {},
+            "tags_all": {},
+            "versioning": [
+              {}
+            ],
+            "website": []
+          }
+        },
+        {
+          "address": "aws_s3_bucket.customer_support",
+          "mode": "managed",
+          "type": "aws_s3_bucket",
+          "name": "customer_support",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "acceleration_status": "",
+            "acl": null,
+            "arn": "arn:aws:s3:::acme-corp-customer-support",
+            "bucket": "acme-corp-customer-support",
+            "bucket_domain_name": "acme-corp-customer-support.s3.amazonaws.com",
+            "bucket_prefix": "",
+            "bucket_regional_domain_name": "acme-corp-customer-support.s3.us-east-1.amazonaws.com",
+            "cors_rule": [],
+            "force_destroy": null,
+            "grant": [
+              {
+                "id": "000000000000",
+                "permissions": [
+                  "FULL_CONTROL"
+                ],
+                "type": "CanonicalUser",
+                "uri": ""
+              }
+            ],
+            "hosted_zone_id": "Z3AQBSTGFYJSTF",
+            "id": "acme-corp-customer-support",
+            "lifecycle_rule": [],
+            "logging": [
+              {
+                "target_bucket": "acme-corp-access-logs",
+                "target_prefix": "customer-support/"
+              }
+            ],
+            "object_lock_configuration": [],
+            "object_lock_enabled": false,
+            "policy": "{\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":[\"arn:aws:s3:::acme-corp-customer-support\",\"arn:aws:s3:::acme-corp-customer-support/*\"],\"Sid\":\"DenyInsecureTransport\"}],\"Version\":\"2012-10-17\"}",
+            "region": "us-east-1",
+            "replication_configuration": [
+              {
+                "role": null,
+                "rules": []
+              }
+            ],
+            "request_payer": "BucketOwner",
+            "server_side_encryption_configuration": [
+              {
+                "rule": [
+                  {
+                    "apply_server_side_encryption_by_default": [
+                      {
+                        "kms_master_key_id": "arn:aws:kms:us-east-1:000000000000:key/1e12849d-22a5-46b3-8239-7c2f5baebdf7",
+                        "sse_algorithm": "aws:kms"
+                      }
+                    ],
+                    "bucket_key_enabled": false
+                  }
+                ]
+              }
+            ],
+            "tags": {
+              "data-classification": "pii",
+              "owner": "acme-corp-app-team"
+            },
+            "tags_all": {
+              "data-classification": "pii",
+              "owner": "acme-corp-app-team"
+            },
+            "timeouts": null,
+            "versioning": [
+              {
+                "enabled": true,
+                "mfa_delete": false
+              }
+            ],
+            "website": [],
+            "website_domain": null,
+            "website_endpoint": null
+          },
+          "sensitive_values": {
+            "cors_rule": [],
+            "grant": [
+              {
+                "permissions": [
+                  false
+                ]
+              }
+            ],
+            "lifecycle_rule": [],
+            "logging": [
+              {}
+            ],
+            "object_lock_configuration": [],
+            "replication_configuration": [
+              {
+                "rules": []
+              }
+            ],
+            "server_side_encryption_configuration": [
+              {
+                "rule": [
+                  {
+                    "apply_server_side_encryption_by_default": [
+                      {}
+                    ]
+                  }
+                ]
+              }
+            ],
+            "tags": {},
+            "tags_all": {},
+            "versioning": [
+              {}
+            ],
+            "website": []
+          }
+        },
+        {
+          "address": "aws_s3_bucket.hr_records",
+          "mode": "managed",
+          "type": "aws_s3_bucket",
+          "name": "hr_records",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "acceleration_status": "",
+            "acl": null,
+            "arn": "arn:aws:s3:::acme-corp-hr-records",
+            "bucket": "acme-corp-hr-records",
+            "bucket_domain_name": "acme-corp-hr-records.s3.amazonaws.com",
+            "bucket_prefix": "",
+            "bucket_regional_domain_name": "acme-corp-hr-records.s3.us-east-1.amazonaws.com",
+            "cors_rule": [],
+            "force_destroy": null,
+            "grant": [
+              {
+                "id": "000000000000",
+                "permissions": [
+                  "FULL_CONTROL"
+                ],
+                "type": "CanonicalUser",
+                "uri": ""
+              }
+            ],
+            "hosted_zone_id": "Z3AQBSTGFYJSTF",
+            "id": "acme-corp-hr-records",
+            "lifecycle_rule": [],
+            "logging": [
+              {
+                "target_bucket": "acme-corp-access-logs",
+                "target_prefix": "hr-records/"
+              }
+            ],
+            "object_lock_configuration": [],
+            "object_lock_enabled": false,
+            "policy": "{\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":[\"arn:aws:s3:::acme-corp-hr-records\",\"arn:aws:s3:::acme-corp-hr-records/*\"],\"Sid\":\"DenyInsecureTransport\"}],\"Version\":\"2012-10-17\"}",
+            "region": "us-east-1",
+            "replication_configuration": [
+              {
+                "role": null,
+                "rules": []
+              }
+            ],
+            "request_payer": "BucketOwner",
+            "server_side_encryption_configuration": [
+              {
+                "rule": [
+                  {
+                    "apply_server_side_encryption_by_default": [
+                      {
+                        "kms_master_key_id": "arn:aws:kms:us-east-1:000000000000:key/1e12849d-22a5-46b3-8239-7c2f5baebdf7",
+                        "sse_algorithm": "aws:kms"
+                      }
+                    ],
+                    "bucket_key_enabled": false
+                  }
+                ]
+              }
+            ],
+            "tags": {
+              "data-classification": "pii",
+              "owner": "acme-corp-app-team"
+            },
+            "tags_all": {
+              "data-classification": "pii",
+              "owner": "acme-corp-app-team"
+            },
+            "timeouts": null,
+            "versioning": [
+              {
+                "enabled": true,
+                "mfa_delete": false
+              }
+            ],
+            "website": [],
+            "website_domain": null,
+            "website_endpoint": null
+          },
+          "sensitive_values": {
+            "cors_rule": [],
+            "grant": [
+              {
+                "permissions": [
+                  false
+                ]
+              }
+            ],
+            "lifecycle_rule": [],
+            "logging": [
+              {}
+            ],
+            "object_lock_configuration": [],
+            "replication_configuration": [
+              {
+                "rules": []
+              }
+            ],
+            "server_side_encryption_configuration": [
+              {
+                "rule": [
+                  {
+                    "apply_server_side_encryption_by_default": [
+                      {}
+                    ]
+                  }
+                ]
+              }
+            ],
+            "tags": {},
+            "tags_all": {},
+            "versioning": [
+              {}
+            ],
+            "website": []
+          }
+        },
+        {
+          "address": "aws_s3_bucket.legacy_backups",
+          "mode": "managed",
+          "type": "aws_s3_bucket",
+          "name": "legacy_backups",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "acceleration_status": "",
+            "acl": null,
+            "arn": "arn:aws:s3:::acme-corp-legacy-backups",
+            "bucket": "acme-corp-legacy-backups",
+            "bucket_domain_name": "acme-corp-legacy-backups.s3.amazonaws.com",
+            "bucket_prefix": "",
+            "bucket_regional_domain_name": "acme-corp-legacy-backups.s3.us-east-1.amazonaws.com",
+            "cors_rule": [],
+            "force_destroy": null,
+            "grant": [
+              {
+                "id": "000000000000",
+                "permissions": [
+                  "FULL_CONTROL"
+                ],
+                "type": "CanonicalUser",
+                "uri": ""
+              }
+            ],
+            "hosted_zone_id": "Z3AQBSTGFYJSTF",
+            "id": "acme-corp-legacy-backups",
+            "lifecycle_rule": [],
+            "logging": [
+              {
+                "target_bucket": "acme-corp-access-logs",
+                "target_prefix": "legacy-backups/"
+              }
+            ],
+            "object_lock_configuration": [],
+            "object_lock_enabled": false,
+            "policy": "{\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":[\"arn:aws:s3:::acme-corp-legacy-backups\",\"arn:aws:s3:::acme-corp-legacy-backups/*\"],\"Sid\":\"DenyInsecureTransport\"}],\"Version\":\"2012-10-17\"}",
+            "region": "us-east-1",
+            "replication_configuration": [
+              {
+                "role": null,
+                "rules": []
+              }
+            ],
+            "request_payer": "BucketOwner",
+            "server_side_encryption_configuration": [
+              {
+                "rule": [
+                  {
+                    "apply_server_side_encryption_by_default": [
+                      {
+                        "kms_master_key_id": "arn:aws:kms:us-east-1:000000000000:key/1e12849d-22a5-46b3-8239-7c2f5baebdf7",
+                        "sse_algorithm": "aws:kms"
+                      }
+                    ],
+                    "bucket_key_enabled": false
+                  }
+                ]
+              }
+            ],
+            "tags": {
+              "data-classification": "pii",
+              "owner": "acme-corp-app-team"
+            },
+            "tags_all": {
+              "data-classification": "pii",
+              "owner": "acme-corp-app-team"
+            },
+            "timeouts": null,
+            "versioning": [
+              {
+                "enabled": true,
+                "mfa_delete": false
+              }
+            ],
+            "website": [],
+            "website_domain": null,
+            "website_endpoint": null
+          },
+          "sensitive_values": {
+            "cors_rule": [],
+            "grant": [
+              {
+                "permissions": [
+                  false
+                ]
+              }
+            ],
+            "lifecycle_rule": [],
+            "logging": [
+              {}
+            ],
+            "object_lock_configuration": [],
+            "replication_configuration": [
+              {
+                "rules": []
+              }
+            ],
+            "server_side_encryption_configuration": [
+              {
+                "rule": [
+                  {
+                    "apply_server_side_encryption_by_default": [
+                      {}
+                    ]
+                  }
+                ]
+              }
+            ],
+            "tags": {},
+            "tags_all": {},
+            "versioning": [
+              {}
+            ],
+            "website": []
+          }
+        },
+        {
+          "address": "aws_s3_bucket.marketing_leads",
+          "mode": "managed",
+          "type": "aws_s3_bucket",
+          "name": "marketing_leads",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "acceleration_status": "",
+            "acl": null,
+            "arn": "arn:aws:s3:::acme-corp-marketing-leads",
+            "bucket": "acme-corp-marketing-leads",
+            "bucket_domain_name": "acme-corp-marketing-leads.s3.amazonaws.com",
+            "bucket_prefix": "",
+            "bucket_regional_domain_name": "acme-corp-marketing-leads.s3.us-east-1.amazonaws.com",
+            "cors_rule": [],
+            "force_destroy": null,
+            "grant": [
+              {
+                "id": "000000000000",
+                "permissions": [
+                  "FULL_CONTROL"
+                ],
+                "type": "CanonicalUser",
+                "uri": ""
+              }
+            ],
+            "hosted_zone_id": "Z3AQBSTGFYJSTF",
+            "id": "acme-corp-marketing-leads",
+            "lifecycle_rule": [],
+            "logging": [
+              {
+                "target_bucket": "acme-corp-access-logs",
+                "target_prefix": "marketing-leads/"
+              }
+            ],
+            "object_lock_configuration": [],
+            "object_lock_enabled": false,
+            "policy": "{\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":[\"arn:aws:s3:::acme-corp-marketing-leads\",\"arn:aws:s3:::acme-corp-marketing-leads/*\"],\"Sid\":\"DenyInsecureTransport\"}],\"Version\":\"2012-10-17\"}",
+            "region": "us-east-1",
+            "replication_configuration": [
+              {
+                "role": null,
+                "rules": []
+              }
+            ],
+            "request_payer": "BucketOwner",
+            "server_side_encryption_configuration": [
+              {
+                "rule": [
+                  {
+                    "apply_server_side_encryption_by_default": [
+                      {
+                        "kms_master_key_id": "arn:aws:kms:us-east-1:000000000000:key/1e12849d-22a5-46b3-8239-7c2f5baebdf7",
+                        "sse_algorithm": "aws:kms"
+                      }
+                    ],
+                    "bucket_key_enabled": false
+                  }
+                ]
+              }
+            ],
+            "tags": {
+              "data-classification": "pii",
+              "owner": "acme-corp-app-team"
+            },
+            "tags_all": {
+              "data-classification": "pii",
+              "owner": "acme-corp-app-team"
+            },
+            "timeouts": null,
+            "versioning": [
+              {
+                "enabled": true,
+                "mfa_delete": false
+              }
+            ],
+            "website": [],
+            "website_domain": null,
+            "website_endpoint": null
+          },
+          "sensitive_values": {
+            "cors_rule": [],
+            "grant": [
+              {
+                "permissions": [
+                  false
+                ]
+              }
+            ],
+            "lifecycle_rule": [],
+            "logging": [
+              {}
+            ],
+            "object_lock_configuration": [],
+            "replication_configuration": [
+              {
+                "rules": []
+              }
+            ],
+            "server_side_encryption_configuration": [
+              {
+                "rule": [
+                  {
+                    "apply_server_side_encryption_by_default": [
+                      {}
+                    ]
+                  }
+                ]
+              }
+            ],
+            "tags": {},
+            "tags_all": {},
+            "versioning": [
+              {}
+            ],
+            "website": []
+          }
+        },
+        {
+          "address": "aws_s3_bucket.payroll_exports",
+          "mode": "managed",
+          "type": "aws_s3_bucket",
+          "name": "payroll_exports",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "acceleration_status": "",
+            "acl": null,
+            "arn": "arn:aws:s3:::acme-corp-payroll-exports",
+            "bucket": "acme-corp-payroll-exports",
+            "bucket_domain_name": "acme-corp-payroll-exports.s3.amazonaws.com",
+            "bucket_prefix": "",
+            "bucket_regional_domain_name": "acme-corp-payroll-exports.s3.us-east-1.amazonaws.com",
+            "cors_rule": [],
+            "force_destroy": null,
+            "grant": [
+              {
+                "id": "000000000000",
+                "permissions": [
+                  "FULL_CONTROL"
+                ],
+                "type": "CanonicalUser",
+                "uri": ""
+              }
+            ],
+            "hosted_zone_id": "Z3AQBSTGFYJSTF",
+            "id": "acme-corp-payroll-exports",
+            "lifecycle_rule": [],
+            "logging": [
+              {
+                "target_bucket": "acme-corp-access-logs",
+                "target_prefix": "payroll-exports/"
+              }
+            ],
+            "object_lock_configuration": [],
+            "object_lock_enabled": false,
+            "policy": "{\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":[\"arn:aws:s3:::acme-corp-payroll-exports\",\"arn:aws:s3:::acme-corp-payroll-exports/*\"],\"Sid\":\"DenyInsecureTransport\"}],\"Version\":\"2012-10-17\"}",
+            "region": "us-east-1",
+            "replication_configuration": [
+              {
+                "role": null,
+                "rules": []
+              }
+            ],
+            "request_payer": "BucketOwner",
+            "server_side_encryption_configuration": [
+              {
+                "rule": [
+                  {
+                    "apply_server_side_encryption_by_default": [
+                      {
+                        "kms_master_key_id": "arn:aws:kms:us-east-1:000000000000:key/1e12849d-22a5-46b3-8239-7c2f5baebdf7",
+                        "sse_algorithm": "aws:kms"
+                      }
+                    ],
+                    "bucket_key_enabled": false
+                  }
+                ]
+              }
+            ],
+            "tags": {
+              "data-classification": "pii",
+              "owner": "acme-corp-app-team"
+            },
+            "tags_all": {
+              "data-classification": "pii",
+              "owner": "acme-corp-app-team"
+            },
+            "timeouts": null,
+            "versioning": [
+              {
+                "enabled": true,
+                "mfa_delete": false
+              }
+            ],
+            "website": [],
+            "website_domain": null,
+            "website_endpoint": null
+          },
+          "sensitive_values": {
+            "cors_rule": [],
+            "grant": [
+              {
+                "permissions": [
+                  false
+                ]
+              }
+            ],
+            "lifecycle_rule": [],
+            "logging": [
+              {}
+            ],
+            "object_lock_configuration": [],
+            "replication_configuration": [
+              {
+                "rules": []
+              }
+            ],
+            "server_side_encryption_configuration": [
+              {
+                "rule": [
+                  {
+                    "apply_server_side_encryption_by_default": [
+                      {}
+                    ]
+                  }
+                ]
+              }
+            ],
+            "tags": {},
+            "tags_all": {},
+            "versioning": [
+              {}
+            ],
+            "website": []
+          }
+        },
+        {
+          "address": "aws_s3_bucket_logging.customer_support",
+          "mode": "managed",
+          "type": "aws_s3_bucket_logging",
+          "name": "customer_support",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "bucket": "acme-corp-customer-support",
+            "expected_bucket_owner": "",
+            "id": "acme-corp-customer-support",
+            "target_bucket": "acme-corp-access-logs",
+            "target_grant": [],
+            "target_object_key_format": [],
+            "target_prefix": "customer-support/"
+          },
+          "sensitive_values": {
+            "target_grant": [],
+            "target_object_key_format": []
+          },
+          "depends_on": [
+            "aws_s3_bucket.access_logs",
+            "aws_s3_bucket.customer_support"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_logging.hr_records",
+          "mode": "managed",
+          "type": "aws_s3_bucket_logging",
+          "name": "hr_records",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "bucket": "acme-corp-hr-records",
+            "expected_bucket_owner": "",
+            "id": "acme-corp-hr-records",
+            "target_bucket": "acme-corp-access-logs",
+            "target_grant": [],
+            "target_object_key_format": [],
+            "target_prefix": "hr-records/"
+          },
+          "sensitive_values": {
+            "target_grant": [],
+            "target_object_key_format": []
+          },
+          "depends_on": [
+            "aws_s3_bucket.access_logs",
+            "aws_s3_bucket.hr_records"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_logging.legacy_backups",
+          "mode": "managed",
+          "type": "aws_s3_bucket_logging",
+          "name": "legacy_backups",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "bucket": "acme-corp-legacy-backups",
+            "expected_bucket_owner": "",
+            "id": "acme-corp-legacy-backups",
+            "target_bucket": "acme-corp-access-logs",
+            "target_grant": [],
+            "target_object_key_format": [],
+            "target_prefix": "legacy-backups/"
+          },
+          "sensitive_values": {
+            "target_grant": [],
+            "target_object_key_format": []
+          },
+          "depends_on": [
+            "aws_s3_bucket.access_logs",
+            "aws_s3_bucket.legacy_backups"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_logging.marketing_leads",
+          "mode": "managed",
+          "type": "aws_s3_bucket_logging",
+          "name": "marketing_leads",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "bucket": "acme-corp-marketing-leads",
+            "expected_bucket_owner": "",
+            "id": "acme-corp-marketing-leads",
+            "target_bucket": "acme-corp-access-logs",
+            "target_grant": [],
+            "target_object_key_format": [],
+            "target_prefix": "marketing-leads/"
+          },
+          "sensitive_values": {
+            "target_grant": [],
+            "target_object_key_format": []
+          },
+          "depends_on": [
+            "aws_s3_bucket.access_logs",
+            "aws_s3_bucket.marketing_leads"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_logging.payroll_exports",
+          "mode": "managed",
+          "type": "aws_s3_bucket_logging",
+          "name": "payroll_exports",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "bucket": "acme-corp-payroll-exports",
+            "expected_bucket_owner": "",
+            "id": "acme-corp-payroll-exports",
+            "target_bucket": "acme-corp-access-logs",
+            "target_grant": [],
+            "target_object_key_format": [],
+            "target_prefix": "payroll-exports/"
+          },
+          "sensitive_values": {
+            "target_grant": [],
+            "target_object_key_format": []
+          },
+          "depends_on": [
+            "aws_s3_bucket.access_logs",
+            "aws_s3_bucket.payroll_exports"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_policy.customer_support",
+          "mode": "managed",
+          "type": "aws_s3_bucket_policy",
+          "name": "customer_support",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "bucket": "acme-corp-customer-support",
+            "id": "acme-corp-customer-support",
+            "policy": "{\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":[\"arn:aws:s3:::acme-corp-customer-support\",\"arn:aws:s3:::acme-corp-customer-support/*\"],\"Sid\":\"DenyInsecureTransport\"}],\"Version\":\"2012-10-17\"}"
+          },
+          "sensitive_values": {},
+          "depends_on": [
+            "aws_s3_bucket.customer_support",
+            "aws_s3_bucket_public_access_block.customer_support"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_policy.hr_records",
+          "mode": "managed",
+          "type": "aws_s3_bucket_policy",
+          "name": "hr_records",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "bucket": "acme-corp-hr-records",
+            "id": "acme-corp-hr-records",
+            "policy": "{\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":[\"arn:aws:s3:::acme-corp-hr-records\",\"arn:aws:s3:::acme-corp-hr-records/*\"],\"Sid\":\"DenyInsecureTransport\"}],\"Version\":\"2012-10-17\"}"
+          },
+          "sensitive_values": {},
+          "depends_on": [
+            "aws_s3_bucket.hr_records",
+            "aws_s3_bucket_public_access_block.hr_records"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_policy.legacy_backups",
+          "mode": "managed",
+          "type": "aws_s3_bucket_policy",
+          "name": "legacy_backups",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "bucket": "acme-corp-legacy-backups",
+            "id": "acme-corp-legacy-backups",
+            "policy": "{\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":[\"arn:aws:s3:::acme-corp-legacy-backups\",\"arn:aws:s3:::acme-corp-legacy-backups/*\"],\"Sid\":\"DenyInsecureTransport\"}],\"Version\":\"2012-10-17\"}"
+          },
+          "sensitive_values": {},
+          "depends_on": [
+            "aws_s3_bucket.legacy_backups",
+            "aws_s3_bucket_public_access_block.legacy_backups"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_policy.marketing_leads",
+          "mode": "managed",
+          "type": "aws_s3_bucket_policy",
+          "name": "marketing_leads",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "bucket": "acme-corp-marketing-leads",
+            "id": "acme-corp-marketing-leads",
+            "policy": "{\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":[\"arn:aws:s3:::acme-corp-marketing-leads\",\"arn:aws:s3:::acme-corp-marketing-leads/*\"],\"Sid\":\"DenyInsecureTransport\"}],\"Version\":\"2012-10-17\"}"
+          },
+          "sensitive_values": {},
+          "depends_on": [
+            "aws_s3_bucket.marketing_leads",
+            "aws_s3_bucket_public_access_block.marketing_leads"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_policy.payroll_exports",
+          "mode": "managed",
+          "type": "aws_s3_bucket_policy",
+          "name": "payroll_exports",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "bucket": "acme-corp-payroll-exports",
+            "id": "acme-corp-payroll-exports",
+            "policy": "{\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":[\"arn:aws:s3:::acme-corp-payroll-exports\",\"arn:aws:s3:::acme-corp-payroll-exports/*\"],\"Sid\":\"DenyInsecureTransport\"}],\"Version\":\"2012-10-17\"}"
+          },
+          "sensitive_values": {},
+          "depends_on": [
+            "aws_s3_bucket.payroll_exports",
+            "aws_s3_bucket_public_access_block.payroll_exports"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_public_access_block.access_logs",
+          "mode": "managed",
+          "type": "aws_s3_bucket_public_access_block",
+          "name": "access_logs",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "block_public_acls": true,
+            "block_public_policy": true,
+            "bucket": "acme-corp-access-logs",
+            "id": "acme-corp-access-logs",
+            "ignore_public_acls": true,
+            "restrict_public_buckets": true
+          },
+          "sensitive_values": {},
+          "depends_on": [
+            "aws_s3_bucket.access_logs"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_public_access_block.customer_support",
+          "mode": "managed",
+          "type": "aws_s3_bucket_public_access_block",
+          "name": "customer_support",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "block_public_acls": true,
+            "block_public_policy": true,
+            "bucket": "acme-corp-customer-support",
+            "id": "acme-corp-customer-support",
+            "ignore_public_acls": true,
+            "restrict_public_buckets": true
+          },
+          "sensitive_values": {},
+          "depends_on": [
+            "aws_s3_bucket.customer_support"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_public_access_block.hr_records",
+          "mode": "managed",
+          "type": "aws_s3_bucket_public_access_block",
+          "name": "hr_records",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "block_public_acls": true,
+            "block_public_policy": true,
+            "bucket": "acme-corp-hr-records",
+            "id": "acme-corp-hr-records",
+            "ignore_public_acls": true,
+            "restrict_public_buckets": true
+          },
+          "sensitive_values": {},
+          "depends_on": [
+            "aws_s3_bucket.hr_records"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_public_access_block.legacy_backups",
+          "mode": "managed",
+          "type": "aws_s3_bucket_public_access_block",
+          "name": "legacy_backups",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "block_public_acls": true,
+            "block_public_policy": true,
+            "bucket": "acme-corp-legacy-backups",
+            "id": "acme-corp-legacy-backups",
+            "ignore_public_acls": true,
+            "restrict_public_buckets": true
+          },
+          "sensitive_values": {},
+          "depends_on": [
+            "aws_s3_bucket.legacy_backups"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_public_access_block.marketing_leads",
+          "mode": "managed",
+          "type": "aws_s3_bucket_public_access_block",
+          "name": "marketing_leads",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "block_public_acls": true,
+            "block_public_policy": true,
+            "bucket": "acme-corp-marketing-leads",
+            "id": "acme-corp-marketing-leads",
+            "ignore_public_acls": true,
+            "restrict_public_buckets": true
+          },
+          "sensitive_values": {},
+          "depends_on": [
+            "aws_s3_bucket.marketing_leads"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_public_access_block.payroll_exports",
+          "mode": "managed",
+          "type": "aws_s3_bucket_public_access_block",
+          "name": "payroll_exports",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "block_public_acls": true,
+            "block_public_policy": true,
+            "bucket": "acme-corp-payroll-exports",
+            "id": "acme-corp-payroll-exports",
+            "ignore_public_acls": true,
+            "restrict_public_buckets": true
+          },
+          "sensitive_values": {},
+          "depends_on": [
+            "aws_s3_bucket.payroll_exports"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_server_side_encryption_configuration.access_logs",
+          "mode": "managed",
+          "type": "aws_s3_bucket_server_side_encryption_configuration",
+          "name": "access_logs",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "bucket": "acme-corp-access-logs",
+            "expected_bucket_owner": "",
+            "id": "acme-corp-access-logs",
+            "rule": [
+              {
+                "apply_server_side_encryption_by_default": [
+                  {
+                    "kms_master_key_id": "arn:aws:kms:us-east-1:000000000000:key/1e12849d-22a5-46b3-8239-7c2f5baebdf7",
+                    "sse_algorithm": "aws:kms"
+                  }
+                ],
+                "bucket_key_enabled": null
+              }
+            ]
+          },
+          "sensitive_values": {
+            "rule": [
+              {
+                "apply_server_side_encryption_by_default": [
+                  {}
+                ]
+              }
+            ]
+          },
+          "depends_on": [
+            "aws_kms_key.pii",
+            "aws_s3_bucket.access_logs"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_server_side_encryption_configuration.customer_support",
+          "mode": "managed",
+          "type": "aws_s3_bucket_server_side_encryption_configuration",
+          "name": "customer_support",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "bucket": "acme-corp-customer-support",
+            "expected_bucket_owner": "",
+            "id": "acme-corp-customer-support",
+            "rule": [
+              {
+                "apply_server_side_encryption_by_default": [
+                  {
+                    "kms_master_key_id": "arn:aws:kms:us-east-1:000000000000:key/1e12849d-22a5-46b3-8239-7c2f5baebdf7",
+                    "sse_algorithm": "aws:kms"
+                  }
+                ],
+                "bucket_key_enabled": false
+              }
+            ]
+          },
+          "sensitive_values": {
+            "rule": [
+              {
+                "apply_server_side_encryption_by_default": [
+                  {}
+                ]
+              }
+            ]
+          },
+          "depends_on": [
+            "aws_kms_key.pii",
+            "aws_s3_bucket.customer_support"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_server_side_encryption_configuration.hr_records",
+          "mode": "managed",
+          "type": "aws_s3_bucket_server_side_encryption_configuration",
+          "name": "hr_records",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "bucket": "acme-corp-hr-records",
+            "expected_bucket_owner": "",
+            "id": "acme-corp-hr-records",
+            "rule": [
+              {
+                "apply_server_side_encryption_by_default": [
+                  {
+                    "kms_master_key_id": "arn:aws:kms:us-east-1:000000000000:key/1e12849d-22a5-46b3-8239-7c2f5baebdf7",
+                    "sse_algorithm": "aws:kms"
+                  }
+                ],
+                "bucket_key_enabled": false
+              }
+            ]
+          },
+          "sensitive_values": {
+            "rule": [
+              {
+                "apply_server_side_encryption_by_default": [
+                  {}
+                ]
+              }
+            ]
+          },
+          "depends_on": [
+            "aws_kms_key.pii",
+            "aws_s3_bucket.hr_records"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_server_side_encryption_configuration.legacy_backups",
+          "mode": "managed",
+          "type": "aws_s3_bucket_server_side_encryption_configuration",
+          "name": "legacy_backups",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "bucket": "acme-corp-legacy-backups",
+            "expected_bucket_owner": "",
+            "id": "acme-corp-legacy-backups",
+            "rule": [
+              {
+                "apply_server_side_encryption_by_default": [
+                  {
+                    "kms_master_key_id": "arn:aws:kms:us-east-1:000000000000:key/1e12849d-22a5-46b3-8239-7c2f5baebdf7",
+                    "sse_algorithm": "aws:kms"
+                  }
+                ],
+                "bucket_key_enabled": false
+              }
+            ]
+          },
+          "sensitive_values": {
+            "rule": [
+              {
+                "apply_server_side_encryption_by_default": [
+                  {}
+                ]
+              }
+            ]
+          },
+          "depends_on": [
+            "aws_kms_key.pii",
+            "aws_s3_bucket.legacy_backups"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_server_side_encryption_configuration.marketing_leads",
+          "mode": "managed",
+          "type": "aws_s3_bucket_server_side_encryption_configuration",
+          "name": "marketing_leads",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "bucket": "acme-corp-marketing-leads",
+            "expected_bucket_owner": "",
+            "id": "acme-corp-marketing-leads",
+            "rule": [
+              {
+                "apply_server_side_encryption_by_default": [
+                  {
+                    "kms_master_key_id": "arn:aws:kms:us-east-1:000000000000:key/1e12849d-22a5-46b3-8239-7c2f5baebdf7",
+                    "sse_algorithm": "aws:kms"
+                  }
+                ],
+                "bucket_key_enabled": false
+              }
+            ]
+          },
+          "sensitive_values": {
+            "rule": [
+              {
+                "apply_server_side_encryption_by_default": [
+                  {}
+                ]
+              }
+            ]
+          },
+          "depends_on": [
+            "aws_kms_key.pii",
+            "aws_s3_bucket.marketing_leads"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_server_side_encryption_configuration.payroll_exports",
+          "mode": "managed",
+          "type": "aws_s3_bucket_server_side_encryption_configuration",
+          "name": "payroll_exports",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "bucket": "acme-corp-payroll-exports",
+            "expected_bucket_owner": "",
+            "id": "acme-corp-payroll-exports",
+            "rule": [
+              {
+                "apply_server_side_encryption_by_default": [
+                  {
+                    "kms_master_key_id": "arn:aws:kms:us-east-1:000000000000:key/1e12849d-22a5-46b3-8239-7c2f5baebdf7",
+                    "sse_algorithm": "aws:kms"
+                  }
+                ],
+                "bucket_key_enabled": false
+              }
+            ]
+          },
+          "sensitive_values": {
+            "rule": [
+              {
+                "apply_server_side_encryption_by_default": [
+                  {}
+                ]
+              }
+            ]
+          },
+          "depends_on": [
+            "aws_kms_key.pii",
+            "aws_s3_bucket.payroll_exports"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_versioning.customer_support",
+          "mode": "managed",
+          "type": "aws_s3_bucket_versioning",
+          "name": "customer_support",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "bucket": "acme-corp-customer-support",
+            "expected_bucket_owner": "",
+            "id": "acme-corp-customer-support",
+            "mfa": null,
+            "versioning_configuration": [
+              {
+                "mfa_delete": "",
+                "status": "Enabled"
+              }
+            ]
+          },
+          "sensitive_values": {
+            "versioning_configuration": [
+              {}
+            ]
+          },
+          "depends_on": [
+            "aws_s3_bucket.customer_support"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_versioning.hr_records",
+          "mode": "managed",
+          "type": "aws_s3_bucket_versioning",
+          "name": "hr_records",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "bucket": "acme-corp-hr-records",
+            "expected_bucket_owner": "",
+            "id": "acme-corp-hr-records",
+            "mfa": null,
+            "versioning_configuration": [
+              {
+                "mfa_delete": "",
+                "status": "Enabled"
+              }
+            ]
+          },
+          "sensitive_values": {
+            "versioning_configuration": [
+              {}
+            ]
+          },
+          "depends_on": [
+            "aws_s3_bucket.hr_records"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_versioning.legacy_backups",
+          "mode": "managed",
+          "type": "aws_s3_bucket_versioning",
+          "name": "legacy_backups",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "bucket": "acme-corp-legacy-backups",
+            "expected_bucket_owner": "",
+            "id": "acme-corp-legacy-backups",
+            "mfa": null,
+            "versioning_configuration": [
+              {
+                "mfa_delete": "",
+                "status": "Enabled"
+              }
+            ]
+          },
+          "sensitive_values": {
+            "versioning_configuration": [
+              {}
+            ]
+          },
+          "depends_on": [
+            "aws_s3_bucket.legacy_backups"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_versioning.marketing_leads",
+          "mode": "managed",
+          "type": "aws_s3_bucket_versioning",
+          "name": "marketing_leads",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "bucket": "acme-corp-marketing-leads",
+            "expected_bucket_owner": "",
+            "id": "acme-corp-marketing-leads",
+            "mfa": null,
+            "versioning_configuration": [
+              {
+                "mfa_delete": "",
+                "status": "Enabled"
+              }
+            ]
+          },
+          "sensitive_values": {
+            "versioning_configuration": [
+              {}
+            ]
+          },
+          "depends_on": [
+            "aws_s3_bucket.marketing_leads"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_versioning.payroll_exports",
+          "mode": "managed",
+          "type": "aws_s3_bucket_versioning",
+          "name": "payroll_exports",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "bucket": "acme-corp-payroll-exports",
+            "expected_bucket_owner": "",
+            "id": "acme-corp-payroll-exports",
+            "mfa": null,
+            "versioning_configuration": [
+              {
+                "mfa_delete": "",
+                "status": "Enabled"
+              }
+            ]
+          },
+          "sensitive_values": {
+            "versioning_configuration": [
+              {}
+            ]
+          },
+          "depends_on": [
+            "aws_s3_bucket.payroll_exports"
+          ]
+        }
+      ]
+    }
+  }
+}
