@@ -502,6 +502,63 @@ datastore, completely separate from the S3 files this script writes directly.
 
 ## 5. Terraform import
 
+### How to figure out the resource type and ID yourself (without already knowing the answer)
+
+`import.tf` in this repo already has the right resource types and IDs, but
+the useful skill is knowing how to work that out from scratch against *any*
+found resource, since you won't always have someone else's answer key.
+
+**Step 1 — find out what actually exists, in plain AWS terms.**
+```bash
+aws s3 ls                                              # bucket names
+aws rds describe-db-instances --query 'DBInstances[].DBInstanceIdentifier'   # instance identifiers
+```
+Terraform import IDs are almost always built from the same natural
+identifiers the AWS CLI already shows you — a bucket name, an instance
+identifier, an ARN. You're not inventing anything new here, just noting what
+the resource is called.
+
+**Step 2 — find the matching Terraform resource *type*.** Search the
+Terraform Registry (`registry.terraform.io/providers/hashicorp/aws/latest/docs`)
+for the AWS service name. The gotcha: one logical S3 bucket is modeled as
+**many separate resource types** in the AWS provider, not one resource with
+nested blocks — `aws_s3_bucket` (the bucket itself), `aws_s3_bucket_policy`,
+`aws_s3_bucket_public_access_block`, `aws_s3_bucket_versioning`,
+`aws_s3_bucket_server_side_encryption_configuration`,
+`aws_s3_bucket_logging`, and more. Each one needs its **own** `import` block
+— this is exactly why 5 buckets in this lab needed 15 import blocks (3 per
+bucket), not 5.
+
+**Step 3 — check that resource type's own "Import" section in the docs.**
+Every resource page on the Registry has an Import section near the bottom
+showing the exact ID format, e.g.:
+```
+% terraform import aws_s3_bucket.bucket bucket-name
+% terraform import aws_db_instance.default mydb-rds-instance
+```
+The ID format is **not consistent across resource types** — don't assume.
+Some are just a name (`aws_s3_bucket`, `aws_db_instance`,
+`aws_db_parameter_group`, `aws_cloudwatch_log_group` — all of these happen to
+use a plain name/identifier, which is why every `id` in this lab's
+`import.tf` looks similar). Others need composite IDs
+(`bucket,key` for some S3 sub-resources in older provider versions;
+`account-id/thing-name` patterns elsewhere) — always check the specific
+resource's docs page, never assume the pattern from a different resource
+type carries over.
+
+**Step 4 — verify the ID format before committing to it.** The fastest way
+to check you got it right is a throwaway classic import:
+```bash
+terraform import aws_s3_bucket.test_only acme-corp-hr-records
+```
+If the ID is wrong, Terraform errors immediately and clearly (e.g.,
+`Cannot import non-existent remote object` — the exact error this lab hit
+early on for the RDS/bucket sub-resources, which was actually correct
+behavior telling us the resource genuinely didn't exist yet, not a wrong ID
+format). A successful import here confirms the ID before you write the
+permanent `import { }` block and remove the throwaway one
+(`terraform state rm aws_s3_bucket.test_only` if you don't want to keep it).
+
 ### `import.tf`
 
 16 blocks: 5 buckets × (`aws_s3_bucket` + `aws_s3_bucket_public_access_block`
