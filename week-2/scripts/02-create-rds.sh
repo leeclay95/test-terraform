@@ -23,27 +23,55 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 EVIDENCE_DIR="$SCRIPT_DIR/../evidence"
 mkdir -p "$EVIDENCE_DIR"
 
-echo "== Creating RDS instance: $DB_ID =="
-aws rds create-db-instance \
-  --db-instance-identifier "$DB_ID" \
-  --db-instance-class db.t3.micro \
-  --engine postgres \
-  --engine-version 16.3 \
-  --master-username appadmin \
-  --master-user-password "DemoPass123!" \
-  --allocated-storage 20 \
-  --db-name appdb \
-  --no-multi-az \
-  --tags Key=data-classification,Value=pii Key=owner,Value=acme-corp-app-team Key=demo,Value=week-2-import \
-  > "$EVIDENCE_DIR/rds_create_response.json"
+# Idempotent: skip creation if the instance already exists, so the script can be
+# re-run to (re)seed without hitting DBInstanceAlreadyExists under `set -e`.
+if aws rds describe-db-instances --db-instance-identifier "$DB_ID" >/dev/null 2>&1; then
+  echo "== RDS instance $DB_ID already exists — skipping create =="
+else
+  echo "== Creating RDS instance: $DB_ID =="
+  aws rds create-db-instance \
+    --db-instance-identifier "$DB_ID" \
+    --db-instance-class db.t3.micro \
+    --engine postgres \
+    --engine-version 16.3 \
+    --master-username appadmin \
+    --master-user-password "DemoPass123!" \
+    --allocated-storage 20 \
+    --db-name appdb \
+    --no-multi-az \
+    --tags Key=data-classification,Value=pii Key=owner,Value=acme-corp-app-team Key=demo,Value=week-2-import \
+    > "$EVIDENCE_DIR/rds_create_response.json"
+fi
 
 echo "== Waiting for instance to report available =="
 aws rds wait db-instance-available --db-instance-identifier "$DB_ID"
 
 aws rds describe-db-instances --db-instance-identifier "$DB_ID" > "$EVIDENCE_DIR/rds_describe.json"
 
-DB_HOST=$(python3 -c "import json; print(json.load(open('$EVIDENCE_DIR/rds_describe.json'))['DBInstances'][0]['Endpoint']['Address'])")
-DB_PORT=$(python3 -c "import json; print(json.load(open('$EVIDENCE_DIR/rds_describe.json'))['DBInstances'][0]['Endpoint']['Port'])")
+# Floci reports the endpoint as localhost:7001, but its docker-compose only
+# publishes 4566 — the backing postgres container's port is NOT mapped to the
+# host, so localhost:7001 is unreachable (connection refused). Connect straight
+# to the container instead: it listens on 5432 on the Docker bridge, reachable
+# from the host by the container's IP. This works regardless of whether Floci
+# publishes the RDS port.
+RDS_ENDPOINT_ADDR=$(python3 -c "import json; print(json.load(open('$EVIDENCE_DIR/rds_describe.json'))['DBInstances'][0]['Endpoint']['Address'])")
+RDS_ENDPOINT_PORT=$(python3 -c "import json; print(json.load(open('$EVIDENCE_DIR/rds_describe.json'))['DBInstances'][0]['Endpoint']['Port'])")
+
+CONTAINER="floci-rds-$DB_ID"
+echo "== Locating backing container: $CONTAINER =="
+DB_HOST=""
+for i in $(seq 1 10); do
+  DB_HOST=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$CONTAINER" 2>/dev/null || true)
+  [ -n "$DB_HOST" ] && break
+  sleep 2
+done
+if [ -z "$DB_HOST" ]; then
+  echo "  Could not find/inspect container $CONTAINER — is Floci running? (docker ps | grep $DB_ID)" >&2
+  exit 1
+fi
+DB_PORT=5432
+echo "  Floci endpoint (metadata):    $RDS_ENDPOINT_ADDR:$RDS_ENDPOINT_PORT  (not host-published)"
+echo "  Reachable endpoint (in use):  $DB_HOST:$DB_PORT"
 
 # Fake-data conventions match the bucket script: example.com emails, an
 # invalid 000-xx-xxxx SSN prefix never issued to a real person.
@@ -79,6 +107,9 @@ CREATE TABLE IF NOT EXISTS users (
   ssn text NOT NULL,
   signup_date date NOT NULL
 );
+-- Idempotent seed: clear existing rows so a re-run doesn't hit duplicate-key
+-- errors on the id primary key.
+TRUNCATE users;
 SQL
 PGPASSWORD="DemoPass123!" psql -h "$DB_HOST" -p "$DB_PORT" -U appadmin -d appdb \
   -c "\copy users FROM '$EVIDENCE_DIR/simulated_users.csv' WITH (FORMAT csv, HEADER true)"
