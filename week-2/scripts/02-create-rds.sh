@@ -23,9 +23,13 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 EVIDENCE_DIR="$SCRIPT_DIR/../evidence"
 mkdir -p "$EVIDENCE_DIR"
 
-# Idempotent: skip creation if the instance already exists, so the script can be
-# re-run to (re)seed without hitting DBInstanceAlreadyExists under `set -e`.
-if aws rds describe-db-instances --db-instance-identifier "$DB_ID" >/dev/null 2>&1; then
+# Idempotent: skip creation only if the instance ACTUALLY exists. Floci's
+# `describe-db-instances --db-instance-identifier X` returns exit 0 even when X
+# does not exist (unlike real AWS, which errors with DBInstanceNotFound), so we
+# check the returned identifier by content — not the exit code.
+EXISTING=$(aws rds describe-db-instances --db-instance-identifier "$DB_ID" \
+  --query 'DBInstances[0].DBInstanceIdentifier' --output text 2>/dev/null || true)
+if [ "$EXISTING" = "$DB_ID" ]; then
   echo "== RDS instance $DB_ID already exists — skipping create =="
 else
   echo "== Creating RDS instance: $DB_ID =="
