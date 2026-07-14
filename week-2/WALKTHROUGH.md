@@ -60,11 +60,52 @@ services:
 mkdir -p floci-data && chmod 777 floci-data
 ```
 The `chmod 777` isn't optional cosmetics — the Floci process inside the
-container runs as a non-root UID (confirmed: UID 1001), while a freshly
+container runs as a non-root UID (confirmed: UID 1001, GID 0), while a freshly
 `mkdir`'d host directory is owned by your own UID with `750`/`775`
 permissions. Without the wider permission, every write fails with
 `Permission denied` and every AWS API call in the affected service starts
 returning 500s.
+
+#### Troubleshooting: `CreateBucket` → 500 even though `s3` shows "running"
+
+Symptom — the health endpoint looks fine, but the very first bucket create
+dies:
+```bash
+curl -s http://localhost:4566/_localstack/health | jq '.services.s3'   # -> "running"
+bash scripts/01-create-buckets.sh
+# make_bucket failed: s3://acme-corp-hr-records An error occurred (500) ...
+#   Internal Server Error
+```
+This is **not** an S3 or IAM problem. In `hybrid` storage mode Floci persists
+state to `/data` on every write, and the failure is a filesystem permission
+mismatch on that mount. Confirm it in the container logs:
+```bash
+docker logs --since 2m <container-name> 2>&1 | grep -A2 'Failed to persist'
+# ERROR ... Failed to persist data to /data/iam-policies.json:
+#   java.io.FileNotFoundException: /data/iam-policies.json.tmp (Permission denied)
+```
+
+The trap: the host `./floci-data` dir can end up owned by **root** (created
+under `sudo`, or by an older Floci image that ran as root) with mode `755`.
+The app runs as UID 1001 / GID 0, so it can't write there. Testing with a
+plain `docker exec ... touch /data/x` is **misleading** — that runs as root
+and succeeds. Test as the real app UID instead:
+```bash
+docker exec -u 1001:0 <container-name> touch /data/_t   # -> Permission denied
+```
+
+Fix — give UID 1001 / GID 0 ownership of the host data dir (recovers an
+already-broken dir; the `chmod 777` above only prevents it at create time):
+```bash
+sudo chown -R 1001:0 ./floci-data
+sudo chmod -R 775 ./floci-data
+```
+No container restart needed — the next persist flush succeeds and
+`CreateBucket` returns 200 immediately. Verify:
+```bash
+docker exec -u 1001:0 <container-name> touch /data/_t && echo WRITE_OK
+aws s3 mb s3://perm-test && aws s3 rb s3://perm-test
+```
 
 ---
 
