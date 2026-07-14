@@ -38,10 +38,7 @@ IAM users) — a leftover `AWS_PROFILE` overrides the static creds above.
 
 **Version matters:** this walkthrough depends on Floci v1.5.30+. On an older
 image, CloudTrail returns `UnknownOperationException` for every operation,
-and this was fixed between versions. Check with:
-```bash
-docker inspect <container-name> --format '{{.Config.Labels}}' | tr ',' '\n' | grep image.version
-```
+and this was fixed between versions.
 
 **Persistent storage matters too.** By default `FLOCI_STORAGE_MODE=hybrid`
 with no volume mount means a container recreate wipes everything. Add this to
