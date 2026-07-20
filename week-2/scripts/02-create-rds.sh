@@ -61,21 +61,48 @@ aws rds describe-db-instances --db-instance-identifier "$DB_ID" > "$EVIDENCE_DIR
 RDS_ENDPOINT_ADDR=$(python3 -c "import json; print(json.load(open('$EVIDENCE_DIR/rds_describe.json'))['DBInstances'][0]['Endpoint']['Address'])")
 RDS_ENDPOINT_PORT=$(python3 -c "import json; print(json.load(open('$EVIDENCE_DIR/rds_describe.json'))['DBInstances'][0]['Endpoint']['Port'])")
 
-CONTAINER="floci-rds-$DB_ID"
-echo "== Locating backing container: $CONTAINER =="
+# Floci names the backing Postgres container floci-rds-<random-hash>, NOT
+# floci-rds-<db-id>, so the name can't be derived from $DB_ID (an earlier
+# version assumed it could and always failed here). Discover it dynamically:
+# enumerate running containers named floci-rds-*, and when more than one is up,
+# pick the one whose Postgres actually answers for appadmin@appdb.
+DB_PORT=5432
+CONTAINER=""
 DB_HOST=""
-for i in $(seq 1 10); do
-  DB_HOST=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$CONTAINER" 2>/dev/null || true)
-  [ -n "$DB_HOST" ] && break
+
+container_ip() { docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$1" 2>/dev/null || true; }
+
+echo "== Locating backing floci-rds container =="
+for attempt in $(seq 1 10); do
+  names=$(docker ps --filter "name=floci-rds-" --format '{{.Names}}')
+  count=$(printf '%s\n' "$names" | grep -c . || true)
+
+  if [ "$count" -eq 1 ]; then
+    CONTAINER="$names"
+    DB_HOST="$(container_ip "$CONTAINER")"
+    [ -n "$DB_HOST" ] && break
+  elif [ "$count" -gt 1 ]; then
+    # Multiple RDS containers — disambiguate by which one accepts our creds.
+    while IFS= read -r c; do
+      [ -z "$c" ] && continue
+      ip="$(container_ip "$c")"
+      [ -z "$ip" ] && continue
+      if PGPASSWORD="DemoPass123!" psql -h "$ip" -p "$DB_PORT" -U appadmin -d appdb -c '\q' 2>/dev/null; then
+        CONTAINER="$c"; DB_HOST="$ip"; break
+      fi
+    done <<< "$names"
+    [ -n "$DB_HOST" ] && break
+  fi
   sleep 2
 done
+
 if [ -z "$DB_HOST" ]; then
-  echo "  Could not find/inspect container $CONTAINER — is Floci running? (docker ps | grep $DB_ID)" >&2
+  echo "  Could not locate a running floci-rds-* container serving appdb." >&2
+  echo "  Is Floci up?  Check: docker ps --filter name=floci-rds-" >&2
   exit 1
 fi
-DB_PORT=5432
-echo "  Floci endpoint (metadata):    $RDS_ENDPOINT_ADDR:$RDS_ENDPOINT_PORT  (not host-published)"
-echo "  Reachable endpoint (in use):  $DB_HOST:$DB_PORT"
+echo "  Floci endpoint (metadata):    $RDS_ENDPOINT_ADDR:$RDS_ENDPOINT_PORT  (proxied by the engine)"
+echo "  Backing container (in use):   $CONTAINER  ->  $DB_HOST:$DB_PORT"
 
 # Fake-data conventions match the bucket script: example.com emails, an
 # invalid 000-xx-xxxx SSN prefix never issued to a real person.
