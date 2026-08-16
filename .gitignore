@@ -5,3 +5,7 @@
 *.zip
 *.hcl
 *.terraform/
+
+# CI workflows MUST be tracked. The blanket *.yml rule above would otherwise
+# hide .github/workflows/, and GitHub only runs workflows that are committed.
+!.github/workflows/*.yml
