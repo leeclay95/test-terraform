@@ -427,8 +427,18 @@ Restore the hardened config on the same branch. No new PR needed — pushing to
 
 ```bash
 git checkout main -- week-4/secure_s3.tf     # take the good version back from main
-git diff --stat
+git status --short week-4/                   # MUST show: M  week-4/secure_s3.tf
 ```
+
+**Do not skip that `git status`.** If it prints nothing, the restore did not happen
+and the next three commands will all succeed while doing nothing: `git add` stages an
+unchanged file, `git commit` says `nothing added to commit`, `git push` says
+`Everything up-to-date`, and `gh pr checks` re-reports the *old* failing run. It looks
+exactly like CI ignoring your fix. It is CI correctly judging a branch you never
+changed.
+
+(`git checkout <ref> -- <path>` stages the file as well as writing it, which is why
+the `M` appears in the left-hand column.)
 
 Verify locally:
 
@@ -649,6 +659,35 @@ light up, copy it into a scanned filename (§4) or scan a copy on its own:
 mkdir -p /tmp/ins && cp week-4/insecure_s3.tf.example /tmp/ins/s3.tf
 tfsec /tmp/ins --minimum-severity HIGH           # 7 findings, always
 ```
+
+**You fixed it, pushed, and the check is still red — with the same elapsed time.**
+You are looking at the previous run; nothing was pushed. The giveaway is the trio
+`nothing added to commit` / `Everything up-to-date` / an unchanged `ELAPSED` value.
+Your working-tree file is identical to what is already committed, so there was no
+change to stage:
+
+```bash
+git status --short week-4/          # empty = nothing to commit, the fix never landed
+git diff main -- week-4/secure_s3.tf   # is the branch still carrying the bad version?
+gh run list --branch "$(git branch --show-current)" --workflow tfsec --limit 3
+```
+
+That last command shows run timestamps — if the newest predates your "fix", CI never
+ran again. Redo the restore in §6, confirm `git status` shows `M`, then commit.
+
+**`gh pr checks` shows the name as `tfsec/tfsec (HIGH+, blockin...`.**
+That is the terminal display format, `<workflow>/<job>`, truncated to fit. The real
+check name — the string branch protection matches on — is just the job name. Confirm
+it rather than guessing:
+
+```bash
+gh api "repos/leeclay95/test-terraform/commits/$(git rev-parse HEAD)/check-runs" \
+  --jq '.check_runs[].name'
+# tfsec (HIGH+, blocking)
+```
+
+Putting `tfsec/tfsec (HIGH+, blocking)` in §3's `contexts` would match nothing, and
+the gate would quietly stop blocking anything.
 
 **No artifact on the run.**
 The upload step is `if: always()`, so it should always exist. If it is missing the job
