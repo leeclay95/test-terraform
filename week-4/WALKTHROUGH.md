@@ -480,10 +480,13 @@ gh pr view --json mergeable,mergeStateStatus --jq '{mergeable, mergeStateStatus}
 # {"mergeable":"MERGEABLE","mergeStateStatus":"CLEAN"}
 ```
 
-Merge:
+Merge — and set the commit message explicitly:
 
 ```bash
-gh pr merge --squash --delete-branch
+gh pr merge --squash --delete-branch \
+  --subject "week-4: harden demo S3 bucket" \
+  --body "tfsec gate added; bucket ships with SSE-KMS CMK and all public access blocked."
+
 git switch main && git pull --ff-only origin main
 ```
 
@@ -497,6 +500,73 @@ gh pr merge --squash --delete-branch --auto    # merges itself once checks are g
 
 You have now watched the same PR go from blocked to mergeable purely on the security
 of its Terraform.
+
+### Two flags that are easy to skip, and expensive to skip
+
+**`--subject` / `--body`.** A squash merge collapses every commit on the branch into
+one, and if you do not name it, **the commit message becomes the PR title**. This PR
+was titled *"insecure S3 (should be blocked)"* — accurate when you opened it in §4,
+badly wrong by the time it merges, because what actually lands on `main` is the
+hardened config. `main`'s history then reads as though someone merged a public,
+unencrypted bucket.
+
+Fix it at merge time. Fixing it afterwards is disproportionately painful: a commit's
+message is part of what its SHA is computed from, so rewording a merged commit means
+rewriting it, which means a force push, which protection (§3) blocks outright. See
+"I already merged with the wrong message" below.
+
+**`--delete-branch`.** Without it the branch survives the merge and accumulates in the
+repo's branch list forever. Merging from the GitHub web UI has the same problem unless
+the repo is configured to clean up. Set that once and stop thinking about it:
+
+```bash
+gh repo edit --delete-branch-on-merge
+gh repo view --json deleteBranchOnMerge --jq .deleteBranchOnMerge   # true
+```
+
+That only affects branches merged *from now on*. Anything already stranded:
+
+```bash
+git push origin --delete week4/insecure-s3     # safe: the commits live on in main
+git fetch --prune                              # drop the stale origin/… ref locally
+git branch -r                                  # confirm it is gone
+```
+
+Note the asymmetry with `main`: protection sets `allow_deletions: false`, so `main`
+cannot be deleted. Feature branches are not protected, and deleting a merged one loses
+nothing — the squash commit on `main` holds all of its content.
+
+### I already merged with the wrong message
+
+You cannot fix it without lifting branch protection, and it is usually not worth it.
+Two things to be clear about first:
+
+- **There is no per-file commit message.** Messages attach to commits, not files. One
+  squash commit touching six files has exactly one message covering all six.
+  `git log -- week-4/secure_s3.tf` filters which commits it shows; it does not give
+  them a file-specific message.
+- **Rewording rewrites.** New message → new SHA → `main` must be repointed → force
+  push. With `allow_force_pushes: false` and required status checks, protection
+  rejects it. There is no flag around that; refusing exactly this is the point of the
+  setting. GitHub's web UI has no commit-message editor either.
+
+What works without touching history, in order of usefulness:
+
+```bash
+# 1. Rename the PR. The squash message on main is unchanged, but the PR page — where
+#    anyone investigating that commit actually lands — now reads correctly.
+gh pr edit 1 --title "week-4: add tfsec HIGH+ gate and hardened S3 example"
+
+# 2. Annotate the commit. Notes live in refs/notes/commits, a ref branch protection
+#    does not govern, so this pushes cleanly. Caveat: GitHub does not render notes in
+#    its web UI — they appear only in `git log --notes` for anyone who fetches them.
+git notes add -m "Merged content is the HARDENED config; the PR title was written for the failing stage of the exercise." <sha>
+git push origin refs/notes/commits
+git log -1 --notes <sha>
+```
+
+If you genuinely need the message changed, §7.5 covers the force-push route and the
+backup branch to take first.
 
 ### Prefer two separate PRs?
 
@@ -527,8 +597,9 @@ gh pr checks week4/pr-pass       # ✓
 Close the failing one without merging — it did its job:
 
 ```bash
-gh pr close week4/pr-fail --delete-branch
-gh pr merge week4/pr-pass --squash --delete-branch
+gh pr close week4/pr-fail --delete-branch      # --delete-branch works on close too
+gh pr merge week4/pr-pass --squash --delete-branch \
+  --subject "week-4: annotate hardened S3 config"
 ```
 
 ---
@@ -553,11 +624,25 @@ because it is not passing. To keep protection but stop requiring the check, re-P
 
 ### 7.2 Delete the demo branches
 
+`git branch -D` only deletes your local copy. The remote branch — the one still
+listed on github.com — needs the second command. Deleting both is safe once the work
+is merged; the squash commit on `main` holds all of the content.
+
 ```bash
 git switch main
 git branch -D week4/insecure-s3 week4/pr-fail week4/pr-pass 2>/dev/null
 git push origin --delete week4/insecure-s3 week4/pr-fail week4/pr-pass 2>/dev/null
-git fetch --prune
+git fetch --prune                # drop stale origin/… refs from your local view
+
+git branch -a                    # confirm: only main and any backup/… remain
+```
+
+To stop merged branches accumulating in the first place, turn on repo-level cleanup —
+it applies to the web merge button too, which `--delete-branch` cannot reach:
+
+```bash
+gh repo edit --delete-branch-on-merge
+gh repo view --json deleteBranchOnMerge --jq .deleteBranchOnMerge   # true
 ```
 
 ### 7.3 Turn the pipeline off
@@ -613,6 +698,56 @@ git show --stat <sha>
 If you removed the workflow but left `.gitignore` alone, that is fine — the
 `!.github/workflows/*.yml` negation is harmless with no workflows present, and you
 will want it again the next time you add one.
+
+### 7.5 Reword a commit already on main — last resort
+
+Only if the non-destructive options in §6 ("I already merged with the wrong message")
+are not enough. This rewrites history on a protected, public branch: the SHA changes,
+so any link, clone or reference to the old commit breaks. `../GIT_WORKFLOW.md` §4
+rule 3 exists because of what a force push did to this repo once already.
+
+Protection blocks the push two ways — `allow_force_pushes: false`, and required status
+checks rejecting any direct push whose commit has not passed them — so protection has
+to come off for the length of one push and go straight back on.
+
+```bash
+git switch main && git pull --ff-only origin main
+
+# Safety net BEFORE anything destructive, per GIT_WORKFLOW.md §6
+git branch backup/pre-amend-$(date +%F)
+git push origin backup/pre-amend-$(date +%F)
+
+git commit --amend -m "week-4: add tfsec HIGH+ gate and hardened S3 example (#1)"
+
+gh api -X DELETE "repos/leeclay95/test-terraform/branches/main/protection"
+git push --force-with-lease origin main
+```
+
+`--force-with-lease`, never bare `--force`: it aborts if someone pushed since your
+last fetch instead of silently overwriting them.
+
+Now re-apply protection **immediately** — §3's payload verbatim. Do not leave this
+for later:
+
+```bash
+gh api -X PUT "repos/leeclay95/test-terraform/branches/main/protection" \
+  -H "Accept: application/vnd.github+json" --input - <<'JSON'
+{
+  "required_status_checks": { "strict": true, "contexts": ["tfsec (HIGH+, blocking)"] },
+  "enforce_admins": true,
+  "required_pull_request_reviews": null,
+  "restrictions": null
+}
+JSON
+
+gh api "repos/leeclay95/test-terraform/branches/main/protection" \
+  --jq '{checks: .required_status_checks.contexts, force: .allow_force_pushes.enabled}'
+# {"checks":["tfsec (HIGH+, blocking)"],"force":false}
+```
+
+`git commit --amend` only reaches the **tip** commit. For anything older the tool is
+`git rebase -i`, which rewrites every commit after it as well — more breakage, same
+force push, and rarely worth it for a wording change.
 
 ---
 
@@ -731,8 +866,21 @@ gh run download <run-id> --name tfsec-evidence-<run-id> --dir /tmp/ev
 
 # --- merge ---------------------------------------------------------------
 gh pr view --json mergeable,mergeStateStatus
-gh pr merge --squash --delete-branch
+gh pr merge --squash --delete-branch --subject "..." --body "..."
+#   ^ without --subject the squash message becomes the PR TITLE. Fixing that
+#     afterwards needs a force push, which protection blocks. Name it here.
 gh pr merge --squash --delete-branch --auto   # merge once checks go green
+
+# --- branch cleanup ------------------------------------------------------
+gh repo edit --delete-branch-on-merge         # once; covers the web merge button too
+git push origin --delete <branch>             # remote branch still on github.com
+git branch -D <branch>                        # local copy only
+git fetch --prune                             # drop stale origin/… refs
+
+# --- wrong commit message, already merged --------------------------------
+gh pr edit <n> --title "..."                  # fixes what people read; no rewrite
+git notes add -m "..." <sha>                  # annotate; GitHub UI won't show it
+#   rewriting the message itself = new SHA = force push = §7.5
 
 # --- undo ----------------------------------------------------------------
 gh workflow disable tfsec                     # off, file kept
